@@ -30,3 +30,36 @@ app.get("/api/hello", function (req, res) {
 var listener = app.listen(process.env.PORT || 3000, function () {
   console.log('Your app is listening on port ' + listener.address().port);
 });
+
+let result={};
+app.get('/api/:date?',(req, res)=>{
+  let givenDate = req.params.date;
+  console.log(givenDate)
+  if(!givenDate){
+    let unix=new Date().getTime();
+    let utc=new Date().toUTCString();
+    console.log(unix, utc)
+    result={unix:unix, utc:utc}
+  }else if(givenDate.includes("-")){
+    let unix=new Date(givenDate).getTime();
+    let utc=new Date(givenDate).toUTCString();
+    console.log(unix, utc)
+    result={unix:unix, utc:utc}
+  } else if(givenDate.includes("GMT")){
+    const normalizedDate = givenDate.replace("GMT", "").trim();
+    let unix=new Date(givenDate).getTime();
+    let utc=new Date(givenDate).toUTCString();
+    console.log(unix, utc)
+    result={unix:unix, utc:utc}
+  } else{
+    let timestamp= parseInt(givenDate, 10);
+    let unix=new Date(timestamp).getTime();
+    let utc=new Date(timestamp).toUTCString();
+    console.log(unix, utc)
+    result={unix: unix, utc:utc}
+  }
+  if(isNaN(result["unix"]) || result["utc"]=== "Invalid Date"){
+    result={error : "Invalid Date"}
+  }
+  res.json(result);
+})
